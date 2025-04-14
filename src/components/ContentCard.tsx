@@ -49,12 +49,12 @@ const ContentCard: React.FC<ContentCardProps> = ({ content }) => {
             <div className="flex items-center">
               <Users size={14} className="mr-1" />
               {content.authors.slice(0, 2).join(', ')}
-              {content.authors.length > 2 && ' et al.'}
+              {content.authors.length > 2 && ' 等'}
             </div>
             {content.citations !== undefined && (
               <div className="flex items-center">
                 <BookOpen size={14} className="mr-1" />
-                {content.citations} citations
+                {content.citations} 引用
               </div>
             )}
           </div>

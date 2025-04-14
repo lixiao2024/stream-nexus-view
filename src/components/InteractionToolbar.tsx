@@ -19,8 +19,8 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
     } else {
       setLikeCount(prev => prev + 1);
       toast({
-        title: "Content liked",
-        description: "We'll show you more content like this",
+        title: "内容已点赞",
+        description: "我们将向您推荐更多类似内容",
       });
     }
     setLiked(!liked);
@@ -29,17 +29,17 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
   const handleSave = () => {
     setSaved(!saved);
     toast({
-      title: saved ? "Removed from saved items" : "Added to saved items",
-      description: saved ? "The item has been removed from your library" : "You can find this in your library",
+      title: saved ? "已从收藏中移除" : "已添加到收藏",
+      description: saved ? "该项目已从您的收藏库中移除" : "您可以在收藏库中找到此内容",
     });
   };
 
   const handleShare = () => {
-    // In a real app, we would implement proper sharing functionality
+    // 在实际应用中，我们会实现适当的共享功能
     navigator.clipboard.writeText(`https://example.com/content/${contentId}`);
     toast({
-      title: "Link copied to clipboard",
-      description: "You can now share this content with others",
+      title: "链接已复制到剪贴板",
+      description: "您现在可以与他人分享此内容",
     });
   };
 
@@ -61,7 +61,7 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
         onClick={handleSave}
       >
         <Bookmark size={18} className={saved ? "fill-current" : ""} />
-        <span className="ml-2">{saved ? "Saved" : "Save"}</span>
+        <span className="ml-2">{saved ? "已收藏" : "收藏"}</span>
       </Button>
       
       <Button
@@ -70,7 +70,7 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
         onClick={handleShare}
       >
         <Share2 size={18} />
-        <span className="ml-2">Share</span>
+        <span className="ml-2">分享</span>
       </Button>
     </div>
   );

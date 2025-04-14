@@ -21,7 +21,7 @@ const SearchBar: React.FC = () => {
       <div className="relative flex items-center">
         <Input
           type="text"
-          placeholder="Search papers, news, tutorials..."
+          placeholder="搜索论文、新闻、教程..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10 pr-20 py-2 w-full rounded-lg border border-gray-200 focus:border-primary focus:ring-primary"
@@ -32,7 +32,7 @@ const SearchBar: React.FC = () => {
           size="sm"
           className="absolute right-1 my-1"
         >
-          Search
+          搜索
         </Button>
       </div>
     </form>

@@ -11,12 +11,12 @@ interface Category {
 }
 
 const categories: Category[] = [
-  { id: 'ai', name: 'AI Research', path: '/category/ai' },
-  { id: 'ml', name: 'Machine Learning', path: '/category/ml' },
-  { id: 'nlp', name: 'NLP', path: '/category/nlp' },
-  { id: 'cv', name: 'Computer Vision', path: '/category/cv' },
-  { id: 'robotics', name: 'Robotics', path: '/category/robotics' },
-  { id: 'ethics', name: 'AI Ethics', path: '/category/ethics' },
+  { id: 'ai', name: '人工智能研究', path: '/category/ai' },
+  { id: 'ml', name: '机器学习', path: '/category/ml' },
+  { id: 'nlp', name: '自然语言处理', path: '/category/nlp' },
+  { id: 'cv', name: '计算机视觉', path: '/category/cv' },
+  { id: 'robotics', name: '机器人学', path: '/category/robotics' },
+  { id: 'ethics', name: '人工智能伦理', path: '/category/ethics' },
 ];
 
 interface NavigationBarProps {
@@ -38,7 +38,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             !activeCategory && "nav-link-active"
           )}
         >
-          All
+          全部
         </Link>
 
         {categories.map((category) => (

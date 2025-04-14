@@ -3,6 +3,7 @@ import React from 'react';
 import SearchBar from '../components/SearchBar';
 import NavigationBar from '../components/NavigationBar';
 import RecommendedFeed from '../components/RecommendedFeed';
+import AuthButtons from '../components/AuthButtons';
 
 const Index = () => {
   return (
@@ -12,10 +13,13 @@ const Index = () => {
         <div className="container mx-auto px-4 py-3">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-primary mr-2">TechNexus</h1>
-              <span className="text-sm text-gray-500">Research & AI News</span>
+              <h1 className="text-2xl font-bold text-primary mr-2">技术视界</h1>
+              <span className="text-sm text-gray-500">研究与人工智能新闻</span>
             </div>
-            <SearchBar />
+            <div className="flex flex-col md:flex-row w-full md:w-auto gap-4 items-center">
+              <SearchBar />
+              <AuthButtons />
+            </div>
           </div>
         </div>
       </header>
@@ -33,7 +37,7 @@ const Index = () => {
       <footer className="bg-gray-50 border-t border-gray-200 mt-12">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center text-gray-500 text-sm">
-            <p>© 2025 TechNexus - AI Research & Technology News Platform</p>
+            <p>© 2025 技术视界 - 人工智能研究与技术新闻平台</p>
           </div>
         </div>
       </footer>
