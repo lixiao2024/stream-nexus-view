@@ -11,6 +11,13 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+// Admin pages
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ArticlesManagement from "./pages/admin/ArticlesManagement";
+import CoursesManagement from "./pages/admin/CoursesManagement";
+import UsersManagement from "./pages/admin/UsersManagement";
+import CommentsManagement from "./pages/admin/CommentsManagement";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -25,6 +32,14 @@ const App = () => (
           <Route path="/course/:id" element={<CourseDetail />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/articles" element={<ArticlesManagement />} />
+          <Route path="/admin/courses" element={<CoursesManagement />} />
+          <Route path="/admin/users" element={<UsersManagement />} />
+          <Route path="/admin/comments" element={<CommentsManagement />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

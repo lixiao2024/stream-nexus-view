@@ -82,6 +82,19 @@ const mockRecommendedContent: Content[] = [
 ];
 
 const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
+  // Function to get badge color based on category
+  const getBadgeStyle = (category: string) => {
+    const categories: Record<string, string> = {
+      '人工智能研究': 'bg-purple-100 text-purple-800 hover:bg-purple-200',
+      '安全': 'bg-red-100 text-red-800 hover:bg-red-200',
+      '自然语言处理': 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+      '计算机视觉': 'bg-green-100 text-green-800 hover:bg-green-200',
+      '机器人学': 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+    };
+    
+    return categories[category] || 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+  };
+
   return (
     <Link to={`/content/${content.id}`}>
       <div className={`flex gap-4 p-4 rounded-lg border ${content.isHighlighted ? 'border-blue-500 bg-blue-500/5' : 'border-gray-800 hover:border-gray-700'} transition-all duration-300 hover:bg-black/20`}>
@@ -104,7 +117,7 @@ const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
             <h3 className={`font-bold ${content.isHighlighted ? 'text-blue-400' : 'text-gray-100'}`}>
               {content.title}
             </h3>
-            <Badge variant="outline" className="text-xs shrink-0">
+            <Badge variant="outline" className={`text-xs shrink-0 ${getBadgeStyle(content.category)}`}>
               {content.category}
             </Badge>
           </div>

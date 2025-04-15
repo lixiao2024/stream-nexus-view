@@ -7,6 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 
+const ADMIN_CREDENTIALS = {
+  email: 'admin',
+  password: '12345'
+};
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,16 +23,35 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    // 这里模拟登录请求
-    setTimeout(() => {
-      // 假设登录成功
-      toast({
-        title: "登录成功",
-        description: "欢迎回来！",
-      });
-      navigate('/');
-      setIsLoading(false);
-    }, 1500);
+    // 检查是否为管理员账号
+    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+      setTimeout(() => {
+        localStorage.setItem('userRole', 'admin');
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        toast({
+          title: "管理员登录成功",
+          description: "欢迎回来，管理员！",
+        });
+        
+        navigate('/admin');
+        setIsLoading(false);
+      }, 1000);
+    } else {
+      // 这里模拟普通用户登录请求
+      setTimeout(() => {
+        localStorage.setItem('userRole', 'user');
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        toast({
+          title: "登录成功",
+          description: "欢迎回来！",
+        });
+        
+        navigate('/');
+        setIsLoading(false);
+      }, 1000);
+    }
   };
 
   return (
@@ -48,13 +72,13 @@ const Login = () => {
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">邮箱</Label>
+              <Label htmlFor="email">账号</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="输入您的账号"
                 required
               />
             </div>
