@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Carousel, 
@@ -15,6 +15,7 @@ import {
   Bot, 
   Database 
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface Course {
   id: string;
@@ -62,13 +63,41 @@ const courses: Course[] = [
   }
 ];
 
+const AUTO_PLAY_INTERVAL = 5000; // 5 seconds
+
 const CourseCarousel = () => {
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+  // Auto-play effect
+  useEffect(() => {
+    if (!api) return;
+    
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, AUTO_PLAY_INTERVAL);
+    
+    return () => clearInterval(interval);
+  }, [api]);
+
   return (
-    <div className="relative overflow-hidden rounded-xl p-1">
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-xl backdrop-blur-sm"></div>
-      
+    <div className="relative overflow-hidden rounded-xl bg-black/20 backdrop-blur-sm border border-gray-800 p-4">
       <Carousel
+        setApi={setApi}
         opts={{
           align: "start",
           loop: true,
@@ -77,16 +106,16 @@ const CourseCarousel = () => {
       >
         <CarouselContent>
           {courses.map((course) => (
-            <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+            <CarouselItem key={course.id} className="basis-full">
               <Link to={`/course/${course.id}`}>
-                <div className="relative group h-[300px] rounded-lg overflow-hidden border border-gray-800 bg-black/50 transition-all duration-300 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/20">
+                <div className="relative group h-[350px] rounded-lg overflow-hidden transition-all duration-300">
                   <div className="absolute inset-0 overflow-hidden">
                     <img 
                       src={course.imageUrl} 
                       alt={course.title}
-                      className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-all duration-500 group-hover:scale-110"
+                      className="w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-all duration-500 group-hover:scale-110"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
                   </div>
                   
                   <div className="absolute top-4 left-4">
@@ -95,24 +124,30 @@ const CourseCarousel = () => {
                     </div>
                   </div>
                   
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-lg font-bold mb-2 text-white">{course.title}</h3>
-                    <p className="text-sm text-gray-300 line-clamp-2">{course.description}</p>
+                  <div className="absolute bottom-0 left-0 right-0 p-6">
+                    <h3 className="text-2xl font-bold mb-3 text-white">{course.title}</h3>
+                    <p className="text-md text-gray-300 mb-4">{course.description}</p>
                     
-                    <div className="mt-4 inline-flex items-center text-blue-400 text-sm font-medium group-hover:text-blue-300 transition-all">
-                      查看详情
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                    <Button 
+                      variant="default" 
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      了解详情
+                    </Button>
                   </div>
                 </div>
               </Link>
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 border-gray-700 text-white hover:bg-black/80 hover:border-blue-500" />
-        <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 border-gray-700 text-white hover:bg-black/80 hover:border-blue-500" />
+        
+        <div className="absolute bottom-6 right-6 flex items-center gap-2 z-10">
+          <div className="text-sm text-white/70">
+            {current} / {count}
+          </div>
+          <CarouselPrevious className="static h-8 w-8 bg-black/50 border-gray-700 text-white hover:bg-black/80 hover:border-blue-500 translate-y-0" />
+          <CarouselNext className="static h-8 w-8 bg-black/50 border-gray-700 text-white hover:bg-black/80 hover:border-blue-500 translate-y-0" />
+        </div>
       </Carousel>
     </div>
   );

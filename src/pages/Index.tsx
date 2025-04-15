@@ -38,7 +38,7 @@ const Index = () => {
         
         <NavigationBar className="mb-6" />
         
-        <div className="space-y-8">
+        <div className="space-y-8 pb-12">
           <RecommendedFeed />
         </div>
       </main>
