@@ -28,7 +28,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Plus, MoreVertical, Pencil, Trash2, Eye } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 interface Article {
@@ -39,6 +40,8 @@ interface Article {
   date: string;
   authors: string[];
   status: 'published' | 'draft';
+  fullText?: string;
+  tags?: string[];
 }
 
 const mockArticles: Article[] = [
@@ -49,7 +52,29 @@ const mockArticles: Article[] = [
     category: '人工智能研究',
     date: '2025-04-12',
     authors: ['Anthropic研究团队'],
-    status: 'published'
+    status: 'published',
+    fullText: `
+    <p class="mb-4">Anthropic公司推出了Claude 3.5，该版本在推理、编码和多模态理解方面有了显著的改进。该模型在所有基准测试中都优于以前的版本。</p>
+    
+    <h2 class="text-xl font-bold mt-6 mb-3">关键改进</h2>
+    <p class="mb-4">Claude 3.5在复杂推理任务方面比Claude 3提高了30%，在数学、编码和多步推理挑战方面表现尤为突出。该模型展示了在遵循细微指令和维持长交互上下文方面的卓越能力。</p>
+    
+    <h2 class="text-xl font-bold mt-6 mb-3">技术规格</h2>
+    <p class="mb-4">Claude 3.5基于经过改进的架构构建，具有扩展到150,000个标记的上下文窗口，允许它在单个提示中处理约300页文本。该模型采用新的训练方法，注重一致性和减少幻觉。</p>
+    
+    <h2 class="text-xl font-bold mt-6 mb-3">基准结果</h2>
+    <p class="mb-4">在标准评估中，Claude 3.5在多个基准测试中取得了最先进的结果：</p>
+    <ul class="list-disc ml-6 mb-4">
+      <li>MMLU：92.3%（Claude 3为89.1%）</li>
+      <li>GSM8K：97.8%（Claude 3为94.2%）</li>
+      <li>HumanEval：90.5%（Claude 3为84.7%）</li>
+      <li>MATH：71.2%（Claude 3为63.5%）</li>
+    </ul>
+    
+    <h2 class="text-xl font-bold mt-6 mb-3">可用性</h2>
+    <p class="mb-4">Claude 3.5最初将向企业客户推出，计划在下个月内普遍可用。API访问将以与现有模型具有竞争力的价格提供，具体费率将很快公布。</p>
+  `,
+    tags: ['LLM', 'Claude', 'AI模型', 'Anthropic'],
   },
   {
     id: '2',
@@ -58,7 +83,8 @@ const mockArticles: Article[] = [
     category: '安全',
     date: '2025-04-11',
     authors: ['安全研究小组'],
-    status: 'published'
+    status: 'published',
+    tags: ['安全', 'Gemini', 'Google', '代码生成'],
   },
   {
     id: '3',
@@ -67,7 +93,8 @@ const mockArticles: Article[] = [
     category: '自然语言处理',
     date: '2025-04-10',
     authors: ['张, L.', '约翰逊, K.', '帕特尔, S.'],
-    status: 'published'
+    status: 'published',
+    tags: ['LLM', '合成数据', '训练', 'NLP'],
   },
   {
     id: '4',
@@ -76,7 +103,8 @@ const mockArticles: Article[] = [
     category: '医疗AI',
     date: '2025-04-08',
     authors: ['医疗研究团队'],
-    status: 'draft'
+    status: 'draft',
+    tags: ['医疗', 'AI诊断', '健康科技'],
   }
 ];
 
@@ -85,13 +113,16 @@ const ArticlesManagement: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [currentArticle, setCurrentArticle] = useState<Article | null>(null);
+  const [previewMode, setPreviewMode] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     title: '',
     summary: '',
     category: '',
-    authors: ''
+    authors: '',
+    fullText: '',
+    tags: ''
   });
 
   const handleOpenNewArticle = () => {
@@ -100,8 +131,11 @@ const ArticlesManagement: React.FC = () => {
       title: '',
       summary: '',
       category: '',
-      authors: ''
+      authors: '',
+      fullText: '',
+      tags: ''
     });
+    setPreviewMode(false);
     setOpenDialog(true);
   };
 
@@ -112,8 +146,26 @@ const ArticlesManagement: React.FC = () => {
       title: article.title,
       summary: article.summary,
       category: article.category,
-      authors: article.authors.join(', ')
+      authors: article.authors.join(', '),
+      fullText: article.fullText || '',
+      tags: article.tags ? article.tags.join(', ') : ''
     });
+    setPreviewMode(false);
+    setOpenDialog(true);
+  };
+
+  const handlePreviewArticle = (article: Article) => {
+    setIsEditing(false);
+    setCurrentArticle(article);
+    setFormData({
+      title: article.title,
+      summary: article.summary,
+      category: article.category,
+      authors: article.authors.join(', '),
+      fullText: article.fullText || '',
+      tags: article.tags ? article.tags.join(', ') : ''
+    });
+    setPreviewMode(true);
     setOpenDialog(true);
   };
 
@@ -142,7 +194,9 @@ const ArticlesManagement: React.FC = () => {
       category: formData.category,
       date: new Date().toISOString().split('T')[0],
       authors: formData.authors.split(',').map(author => author.trim()),
-      status: 'draft'
+      status: 'draft',
+      fullText: formData.fullText,
+      tags: formData.tags.split(',').map(tag => tag.trim())
     };
 
     if (isEditing && currentArticle) {
@@ -227,6 +281,10 @@ const ArticlesManagement: React.FC = () => {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handlePreviewArticle(article)}>
+                      <Eye className="mr-2 h-4 w-4" />
+                      预览
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => handleEditArticle(article)}>
                       <Pencil className="mr-2 h-4 w-4" />
                       编辑
@@ -250,62 +308,158 @@ const ArticlesManagement: React.FC = () => {
       </Table>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className="sm:max-w-[525px]">
+        <DialogContent className={previewMode ? "sm:max-w-[800px]" : "sm:max-w-[725px]"}>
           <DialogHeader>
-            <DialogTitle>{isEditing ? '编辑文章' : '添加新文章'}</DialogTitle>
+            <DialogTitle>
+              {previewMode 
+                ? "预览文章" 
+                : (isEditing ? "编辑文章" : "添加新文章")}
+            </DialogTitle>
             <DialogDescription>
-              {isEditing 
-                ? '修改文章的信息并保存更改。' 
-                : '添加新文章的详细信息。保存后，文章将以草稿状态创建。'}
+              {previewMode 
+                ? "查看文章在前台的显示效果" 
+                : (isEditing 
+                  ? "修改文章的信息并保存更改。" 
+                  : "添加新文章的详细信息。保存后，文章将以草稿状态创建。")}
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="title">标题</Label>
-                <Input
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  required
-                />
+          
+          {previewMode ? (
+            <div className="border rounded-md p-6 max-h-[600px] overflow-auto">
+              <div className="mb-6">
+                <div className="mb-2">
+                  <Badge variant="outline" className="mb-2">
+                    {formData.category}
+                  </Badge>
+                  <h1 className="text-3xl font-bold text-gray-900">{formData.title}</h1>
+                </div>
+                
+                <div className="flex flex-wrap items-center text-sm text-gray-600 gap-4 mt-4">
+                  <div className="flex items-center">
+                    {currentArticle?.date || new Date().toISOString().split('T')[0]}
+                  </div>
+                  <div className="flex items-center">
+                    {formData.authors}
+                  </div>
+                </div>
+                
+                {formData.tags && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {formData.tags.split(',').map(tag => (
+                      <Badge key={tag} variant="secondary" className="text-xs">
+                        {tag.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="summary">摘要</Label>
-                <Textarea
-                  id="summary"
-                  name="summary"
-                  value={formData.summary}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="category">分类</Label>
-                <Input
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="authors">作者 (用逗号分隔多个作者)</Label>
-                <Input
-                  id="authors"
-                  name="authors"
-                  value={formData.authors}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
+              
+              <div 
+                className="prose max-w-none" 
+                dangerouslySetInnerHTML={{ __html: formData.fullText }} 
+              />
             </div>
-            <DialogFooter>
-              <Button type="submit">{isEditing ? '保存更改' : '添加文章'}</Button>
-            </DialogFooter>
-          </form>
+          ) : (
+            <form onSubmit={handleSubmit}>
+              <Tabs defaultValue="basic">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="basic">基本信息</TabsTrigger>
+                  <TabsTrigger value="content">文章内容</TabsTrigger>
+                  <TabsTrigger value="tags">标签</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic" className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="title">标题</Label>
+                    <Input
+                      id="title"
+                      name="title"
+                      value={formData.title}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="summary">摘要</Label>
+                    <Textarea
+                      id="summary"
+                      name="summary"
+                      value={formData.summary}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">分类</Label>
+                    <Input
+                      id="category"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="authors">作者 (用逗号分隔多个作者)</Label>
+                    <Input
+                      id="authors"
+                      name="authors"
+                      value={formData.authors}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="content" className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="fullText">文章内容 (支持HTML/Markdown格式)</Label>
+                    <Textarea
+                      id="fullText"
+                      name="fullText"
+                      value={formData.fullText}
+                      onChange={handleInputChange}
+                      className="min-h-[300px] font-mono"
+                    />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="tags" className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="tags">标签 (用逗号分隔多个标签)</Label>
+                    <Input
+                      id="tags"
+                      name="tags"
+                      value={formData.tags}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  
+                  {formData.tags && (
+                    <div className="mt-4">
+                      <Label>预览标签</Label>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag).map(tag => (
+                          <Badge key={tag} variant="secondary" className="text-xs">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+              
+              <DialogFooter className="mt-6">
+                {!isEditing && (
+                  <Button type="button" variant="outline" className="mr-2" onClick={() => setPreviewMode(true)}>
+                    预览
+                  </Button>
+                )}
+                <Button type="submit">{isEditing ? '保存更改' : '添加文章'}</Button>
+              </DialogFooter>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     </AdminLayout>
