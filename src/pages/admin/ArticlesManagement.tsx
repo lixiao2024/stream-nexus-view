@@ -29,8 +29,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, MoreVertical, Pencil, Trash2, Eye } from 'lucide-react';
+import { Plus, MoreVertical, Pencil, Trash2, Eye, FileImage, Upload } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import ReactMarkdown from 'react-markdown';
 
 interface Article {
   id: string;
@@ -42,6 +43,7 @@ interface Article {
   status: 'published' | 'draft';
   fullText?: string;
   tags?: string[];
+  coverImage?: string;
 }
 
 const mockArticles: Article[] = [
@@ -54,27 +56,33 @@ const mockArticles: Article[] = [
     authors: ['Anthropic研究团队'],
     status: 'published',
     fullText: `
-    <p class="mb-4">Anthropic公司推出了Claude 3.5，该版本在推理、编码和多模态理解方面有了显著的改进。该模型在所有基准测试中都优于以前的版本。</p>
+# Claude 3.5 发布
     
-    <h2 class="text-xl font-bold mt-6 mb-3">关键改进</h2>
-    <p class="mb-4">Claude 3.5在复杂推理任务方面比Claude 3提高了30%，在数学、编码和多步推理挑战方面表现尤为突出。该模型展示了在遵循细微指令和维持长交互上下文方面的卓越能力。</p>
+Anthropic公司推出了Claude 3.5，该版本在推理、编码和多模态理解方面有了显著的改进。该模型在所有基准测试中都优于以前的版本。
     
-    <h2 class="text-xl font-bold mt-6 mb-3">技术规格</h2>
-    <p class="mb-4">Claude 3.5基于经过改进的架构构建，具有扩展到150,000个标记的上下文窗口，允许它在单个提示中处理约300页文本。该模型采用新的训练方法，注重一致性和减少幻觉。</p>
+## 关键改进
     
-    <h2 class="text-xl font-bold mt-6 mb-3">基准结果</h2>
-    <p class="mb-4">在标准评估中，Claude 3.5在多个基准测试中取得了最先进的结果：</p>
-    <ul class="list-disc ml-6 mb-4">
-      <li>MMLU：92.3%（Claude 3为89.1%）</li>
-      <li>GSM8K：97.8%（Claude 3为94.2%）</li>
-      <li>HumanEval：90.5%（Claude 3为84.7%）</li>
-      <li>MATH：71.2%（Claude 3为63.5%）</li>
-    </ul>
+Claude 3.5在复杂推理任务方面比Claude 3提高了30%，在数学、编码和多步推理挑战方面表现尤为突出。该模型展示了在遵循细微指令和维持长交互上下文方面的卓越能力。
     
-    <h2 class="text-xl font-bold mt-6 mb-3">可用性</h2>
-    <p class="mb-4">Claude 3.5最初将向企业客户推出，计划在下个月内普遍可用。API访问将以与现有模型具有竞争力的价格提供，具体费率将很快公布。</p>
+## 技术规格
+    
+Claude 3.5基于经过改进的架构构建，具有扩展到150,000个标记的上下文窗口，允许它在单个提示中处理约300页文本。该模型采用新的训练方法，注重一致性和减少幻觉。
+    
+## 基准结果
+    
+在标准评估中，Claude 3.5在多个基准测试中取得了最先进的结果：
+    
+- MMLU：92.3%（Claude 3为89.1%）
+- GSM8K：97.8%（Claude 3为94.2%）
+- HumanEval：90.5%（Claude 3为84.7%）
+- MATH：71.2%（Claude 3为63.5%）
+    
+## 可用性
+    
+Claude 3.5最初将向企业客户推出，计划在下个月内普遍可用。API访问将以与现有模型具有竞争力的价格提供，具体费率将很快公布。
   `,
     tags: ['LLM', 'Claude', 'AI模型', 'Anthropic'],
+    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
   },
   {
     id: '2',
@@ -85,6 +93,7 @@ const mockArticles: Article[] = [
     authors: ['安全研究小组'],
     status: 'published',
     tags: ['安全', 'Gemini', 'Google', '代码生成'],
+    coverImage: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742',
   },
   {
     id: '3',
@@ -95,6 +104,7 @@ const mockArticles: Article[] = [
     authors: ['张, L.', '约翰逊, K.', '帕特尔, S.'],
     status: 'published',
     tags: ['LLM', '合成数据', '训练', 'NLP'],
+    coverImage: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
   },
   {
     id: '4',
@@ -105,7 +115,20 @@ const mockArticles: Article[] = [
     authors: ['医疗研究团队'],
     status: 'draft',
     tags: ['医疗', 'AI诊断', '健康科技'],
+    coverImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
   }
+];
+
+const placeholderImages = [
+  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
+  'https://images.unsplash.com/photo-1518005020951-eccb494ad742',
+  'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
+  'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
+  'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+  'https://images.unsplash.com/photo-1487958449943-2429e8be8625',
+  'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+  'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+  'https://images.unsplash.com/photo-1605810230434-7631ac76ec81',
 ];
 
 const ArticlesManagement: React.FC = () => {
@@ -122,7 +145,8 @@ const ArticlesManagement: React.FC = () => {
     category: '',
     authors: '',
     fullText: '',
-    tags: ''
+    tags: '',
+    coverImage: ''
   });
 
   const handleOpenNewArticle = () => {
@@ -133,7 +157,8 @@ const ArticlesManagement: React.FC = () => {
       category: '',
       authors: '',
       fullText: '',
-      tags: ''
+      tags: '',
+      coverImage: placeholderImages[Math.floor(Math.random() * placeholderImages.length)]
     });
     setPreviewMode(false);
     setOpenDialog(true);
@@ -148,7 +173,8 @@ const ArticlesManagement: React.FC = () => {
       category: article.category,
       authors: article.authors.join(', '),
       fullText: article.fullText || '',
-      tags: article.tags ? article.tags.join(', ') : ''
+      tags: article.tags ? article.tags.join(', ') : '',
+      coverImage: article.coverImage || ''
     });
     setPreviewMode(false);
     setOpenDialog(true);
@@ -163,7 +189,8 @@ const ArticlesManagement: React.FC = () => {
       category: article.category,
       authors: article.authors.join(', '),
       fullText: article.fullText || '',
-      tags: article.tags ? article.tags.join(', ') : ''
+      tags: article.tags ? article.tags.join(', ') : '',
+      coverImage: article.coverImage || ''
     });
     setPreviewMode(true);
     setOpenDialog(true);
@@ -184,6 +211,13 @@ const ArticlesManagement: React.FC = () => {
     });
   };
 
+  const handleCoverImageSelect = (imageUrl: string) => {
+    setFormData({
+      ...formData,
+      coverImage: imageUrl
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -196,7 +230,8 @@ const ArticlesManagement: React.FC = () => {
       authors: formData.authors.split(',').map(author => author.trim()),
       status: 'draft',
       fullText: formData.fullText,
-      tags: formData.tags.split(',').map(tag => tag.trim())
+      tags: formData.tags.split(',').map(tag => tag.trim()),
+      coverImage: formData.coverImage
     };
 
     if (isEditing && currentArticle) {
@@ -234,6 +269,26 @@ const ArticlesManagement: React.FC = () => {
     });
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setFormData({
+        ...formData,
+        fullText: content
+      });
+      
+      toast({
+        title: "上传成功",
+        description: "Markdown文件已成功上传",
+      });
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
@@ -250,6 +305,7 @@ const ArticlesManagement: React.FC = () => {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>封面</TableHead>
             <TableHead>标题</TableHead>
             <TableHead>分类</TableHead>
             <TableHead>作者</TableHead>
@@ -261,6 +317,21 @@ const ArticlesManagement: React.FC = () => {
         <TableBody>
           {articles.map((article) => (
             <TableRow key={article.id}>
+              <TableCell>
+                {article.coverImage ? (
+                  <div className="w-16 h-12 rounded overflow-hidden">
+                    <img 
+                      src={`${article.coverImage}?w=120&h=90&fit=crop`} 
+                      alt={article.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center">
+                    <FileImage className="h-6 w-6 text-gray-400" />
+                  </div>
+                )}
+              </TableCell>
               <TableCell className="font-medium">{article.title}</TableCell>
               <TableCell>{article.category}</TableCell>
               <TableCell>{article.authors.join(', ')}</TableCell>
@@ -326,6 +397,16 @@ const ArticlesManagement: React.FC = () => {
           
           {previewMode ? (
             <div className="border rounded-md p-6 max-h-[600px] overflow-auto">
+              {formData.coverImage && (
+                <div className="mb-6 w-full h-64 rounded-lg overflow-hidden">
+                  <img 
+                    src={`${formData.coverImage}?w=800&h=400&fit=crop`} 
+                    alt={formData.title} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              
               <div className="mb-6">
                 <div className="mb-2">
                   <Badge variant="outline" className="mb-2">
@@ -354,10 +435,9 @@ const ArticlesManagement: React.FC = () => {
                 )}
               </div>
               
-              <div 
-                className="prose max-w-none" 
-                dangerouslySetInnerHTML={{ __html: formData.fullText }} 
-              />
+              <div className="prose max-w-none">
+                <ReactMarkdown>{formData.fullText}</ReactMarkdown>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
@@ -365,6 +445,7 @@ const ArticlesManagement: React.FC = () => {
                 <TabsList className="mb-4">
                   <TabsTrigger value="basic">基本信息</TabsTrigger>
                   <TabsTrigger value="content">文章内容</TabsTrigger>
+                  <TabsTrigger value="cover">封面图片</TabsTrigger>
                   <TabsTrigger value="tags">标签</TabsTrigger>
                 </TabsList>
                 
@@ -413,7 +494,24 @@ const ArticlesManagement: React.FC = () => {
                 
                 <TabsContent value="content" className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="fullText">文章内容 (支持HTML/Markdown格式)</Label>
+                    <div className="flex justify-between items-center">
+                      <Label htmlFor="fullText">文章内容 (Markdown格式)</Label>
+                      <div className="flex items-center">
+                        <Label htmlFor="markdown-upload" className="cursor-pointer">
+                          <div className="flex items-center text-sm text-primary hover:text-primary/80">
+                            <Upload className="h-4 w-4 mr-1" />
+                            上传Markdown文件
+                          </div>
+                          <Input
+                            id="markdown-upload"
+                            type="file"
+                            accept=".md,.markdown,.txt"
+                            className="hidden"
+                            onChange={handleFileUpload}
+                          />
+                        </Label>
+                      </div>
+                    </div>
                     <Textarea
                       id="fullText"
                       name="fullText"
@@ -421,6 +519,54 @@ const ArticlesManagement: React.FC = () => {
                       onChange={handleInputChange}
                       className="min-h-[300px] font-mono"
                     />
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="cover" className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>选择封面图片</Label>
+                    <div className="grid grid-cols-3 gap-4 mt-2">
+                      {placeholderImages.map((img) => (
+                        <div 
+                          key={img}
+                          className={`relative rounded-lg overflow-hidden cursor-pointer h-40 border-2 ${
+                            formData.coverImage === img ? 'border-primary' : 'border-transparent'
+                          }`}
+                          onClick={() => handleCoverImageSelect(img)}
+                        >
+                          <img
+                            src={`${img}?w=300&h=200&fit=crop`}
+                            alt="封面选项"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {formData.coverImage && (
+                      <div className="mt-4">
+                        <Label>当前选择的封面</Label>
+                        <div className="mt-2 rounded-lg overflow-hidden h-40">
+                          <img
+                            src={`${formData.coverImage}?w=600&h=300&fit=crop`}
+                            alt="当前封面"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mt-2">
+                      <Label htmlFor="customCoverUrl">或输入自定义图片URL</Label>
+                      <Input
+                        id="customCoverUrl"
+                        name="coverImage"
+                        value={formData.coverImage}
+                        onChange={handleInputChange}
+                        placeholder="https://example.com/image.jpg"
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
                 </TabsContent>
                 

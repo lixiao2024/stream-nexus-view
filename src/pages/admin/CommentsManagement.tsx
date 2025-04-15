@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import {
   Table,
@@ -10,11 +10,22 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Check, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Trash2 } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+
+interface Comment {
+  id: string;
+  user: string;
+  content: string;
+  contentTitle: string;
+  contentType: 'course' | 'article';
+  date: string;
+}
 
 const CommentsManagement: React.FC = () => {
-  const comments = [
+  const { toast } = useToast();
+  const [comments, setComments] = useState<Comment[]>([
     {
       id: '1',
       user: '张三',
@@ -22,7 +33,6 @@ const CommentsManagement: React.FC = () => {
       contentTitle: '量子计算与AI交叉应用',
       contentType: 'course',
       date: '2025-04-10',
-      status: 'approved',
     },
     {
       id: '2',
@@ -31,7 +41,6 @@ const CommentsManagement: React.FC = () => {
       contentTitle: '使用合成数据训练大型语言模型：比较研究',
       contentType: 'article',
       date: '2025-04-11',
-      status: 'pending',
     },
     {
       id: '3',
@@ -40,7 +49,6 @@ const CommentsManagement: React.FC = () => {
       contentTitle: '在Google Gemini代码生成中发现安全漏洞',
       contentType: 'article',
       date: '2025-04-12',
-      status: 'approved',
     },
     {
       id: '4',
@@ -49,9 +57,16 @@ const CommentsManagement: React.FC = () => {
       contentTitle: '大模型提示工程高级技巧',
       contentType: 'course',
       date: '2025-04-13',
-      status: 'rejected',
     },
-  ];
+  ]);
+
+  const handleDeleteComment = (id: string) => {
+    setComments(comments.filter(comment => comment.id !== id));
+    toast({
+      title: "删除成功",
+      description: "评论已成功删除",
+    });
+  };
 
   return (
     <AdminLayout>
@@ -68,7 +83,6 @@ const CommentsManagement: React.FC = () => {
             <TableHead>关联内容</TableHead>
             <TableHead>类型</TableHead>
             <TableHead>日期</TableHead>
-            <TableHead>状态</TableHead>
             <TableHead className="text-right">操作</TableHead>
           </TableRow>
         </TableHeader>
@@ -84,40 +98,12 @@ const CommentsManagement: React.FC = () => {
                 </Badge>
               </TableCell>
               <TableCell>{comment.date}</TableCell>
-              <TableCell>
-                <Badge 
-                  variant={comment.status === 'pending' ? 'outline' : 'default'}
-                  className={
-                    comment.status === 'approved' 
-                      ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                      : comment.status === 'rejected'
-                      ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                      : ''
-                  }
-                >
-                  {comment.status === 'approved' 
-                    ? '已通过' 
-                    : comment.status === 'rejected' 
-                    ? '已拒绝' 
-                    : '待审核'}
-                </Badge>
-              </TableCell>
               <TableCell className="text-right">
-                {comment.status === 'pending' && (
-                  <>
-                    <Button variant="ghost" size="icon" className="text-green-600">
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" className="text-red-600">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-                {comment.status !== 'pending' && (
-                  <Button variant="ghost" size="sm" className="text-red-600">
-                    删除
-                  </Button>
-                )}
+                <Button variant="ghost" size="sm" className="text-red-600"
+                  onClick={() => handleDeleteComment(comment.id)}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  删除
+                </Button>
               </TableCell>
             </TableRow>
           ))}
