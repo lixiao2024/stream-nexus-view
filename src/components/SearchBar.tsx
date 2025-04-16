@@ -24,7 +24,7 @@ const SearchBar: React.FC = () => {
           placeholder="搜索论文、新闻、教程..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-20 py-2 w-full rounded-lg border border-gray-200 focus:border-primary focus:ring-primary"
+          className="pl-10 pr-20 py-2 w-full rounded-lg border border-gray-200 focus:border-primary focus:ring-primary text-gray-900 dark:text-gray-100" // 改进文字颜色
         />
         <Search className="absolute left-3 text-gray-400" size={18} />
         <Button 

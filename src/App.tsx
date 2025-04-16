@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Profile from "./pages/Profile";
+import Search from "./pages/Search";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/search" element={<Search />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
