@@ -19,20 +19,34 @@ const Search = () => {
 
   useEffect(() => {
     if (query) {
-      // Filter articles based on the search query
+      const normalizedQuery = query.toLowerCase().trim();
+      
+      // Enhanced filtering for articles
       const articlesResults = mockArticles.filter(article => 
-        article.title.toLowerCase().includes(query.toLowerCase()) || 
-        article.summary.toLowerCase().includes(query.toLowerCase()) ||
-        article.tags?.some(tag => tag.toLowerCase().includes(query.toLowerCase())) ||
-        article.authors.some(author => author.toLowerCase().includes(query.toLowerCase()))
+        // Title match
+        article.title.toLowerCase().includes(normalizedQuery) || 
+        // Summary/content match
+        article.summary.toLowerCase().includes(normalizedQuery) ||
+        // Tag match
+        (article.tags && article.tags.some(tag => 
+          tag.toLowerCase().includes(normalizedQuery)
+        )) ||
+        // Author match
+        article.authors.some(author => 
+          author.toLowerCase().includes(normalizedQuery)
+        )
       );
       
-      // Filter courses based on the search query
+      // Enhanced filtering for courses with the same logic
       const coursesResults = mockCourses.filter(course => 
-        course.title.toLowerCase().includes(query.toLowerCase()) || 
-        course.summary.toLowerCase().includes(query.toLowerCase()) ||
-        course.tags?.some(tag => tag.toLowerCase().includes(query.toLowerCase())) ||
-        course.authors.some(author => author.toLowerCase().includes(query.toLowerCase()))
+        course.title.toLowerCase().includes(normalizedQuery) || 
+        course.summary.toLowerCase().includes(normalizedQuery) ||
+        (course.tags && course.tags.some(tag => 
+          tag.toLowerCase().includes(normalizedQuery)
+        )) ||
+        course.authors.some(author => 
+          author.toLowerCase().includes(normalizedQuery)
+        )
       );
       
       setFilteredArticles(articlesResults);
