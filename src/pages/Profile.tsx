@@ -84,6 +84,14 @@ const Profile: React.FC = () => {
       reader.onload = (event) => {
         const result = event.target?.result as string;
         setAvatar(result);
+        
+        // 立即保存头像到 localStorage
+        localStorage.setItem('userAvatar', result);
+        
+        toast({
+          title: "头像已更新",
+          description: "您的头像已成功上传并保存",
+        });
       };
       reader.readAsDataURL(file);
     }

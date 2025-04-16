@@ -35,6 +35,27 @@ const AuthButtons: React.FC = () => {
     if (name) {
       setUserName(name);
     }
+
+    // 添加事件监听器以实时更新头像
+    const handleStorageChange = () => {
+      const updatedAvatar = localStorage.getItem('userAvatar');
+      const updatedName = localStorage.getItem('userName');
+      
+      setUserAvatar(updatedAvatar);
+      if (updatedName) {
+        setUserName(updatedName);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    // 监听自定义事件
+    document.addEventListener('avatarUpdated', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      document.removeEventListener('avatarUpdated', handleStorageChange);
+    };
   }, []);
 
   const handleLogout = () => {
