@@ -11,6 +11,7 @@ import CourseEnrollment from "./pages/CourseEnrollment";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 // Admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/course-enrollment/:id" element={<CourseEnrollment />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />

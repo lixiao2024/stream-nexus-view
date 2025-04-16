@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { LogIn, UserPlus, User, LogOut, Settings } from 'lucide-react';
+import { LogIn, UserPlus, User, LogOut, Settings, Upload } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,22 +10,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from '@/components/ui/use-toast';
 
 const AuthButtons: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string>('用户');
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
-    // 检查localStorage中的登录状态
+    // 检查localStorage中的登录状态和用户信息
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
     const userRole = localStorage.getItem('userRole');
+    const avatar = localStorage.getItem('userAvatar');
+    const name = localStorage.getItem('userName');
     
     setIsLoggedIn(loggedIn);
     setIsAdmin(userRole === 'admin');
+    setUserAvatar(avatar);
+    
+    if (name) {
+      setUserName(name);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -48,11 +57,15 @@ const AuthButtons: React.FC = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center space-x-2">
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary/10 text-primary">
-                {isAdmin ? 'A' : 'U'}
-              </AvatarFallback>
+              {userAvatar ? (
+                <AvatarImage src={userAvatar} alt={userName} />
+              ) : (
+                <AvatarFallback className="bg-primary/10 text-primary">
+                  {userName.substring(0, 1).toUpperCase()}
+                </AvatarFallback>
+              )}
             </Avatar>
-            <span className="hidden md:inline">{isAdmin ? '管理员' : '用户'}</span>
+            <span className="hidden md:inline">{isAdmin ? '管理员' : userName}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
