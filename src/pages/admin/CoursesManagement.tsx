@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -29,9 +28,18 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, MoreVertical, Pencil, Trash2, Eye, FileImage } from 'lucide-react';
+import { Plus, MoreVertical, Pencil, Trash2, Eye, FileImage, Video, File } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import ReactMarkdown from 'react-markdown';
+
+interface CourseChapter {
+  title: string;
+  lessons: {
+    title: string;
+    videoUrl?: string;
+    materials?: string[];
+  }[];
+}
 
 interface Course {
   id: string;
@@ -44,6 +52,9 @@ interface Course {
   content?: string;
   tags?: string[];
   coverImage?: string;
+  price?: number;
+  isFree?: boolean;
+  chapters?: CourseChapter[];
 }
 
 const mockCourses: Course[] = [
@@ -57,40 +68,47 @@ const mockCourses: Course[] = [
     status: 'published',
     tags: ['量子计算', 'AI应用', '前沿技术'],
     coverImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625',
+    price: 0,
+    isFree: true,
+    chapters: [
+      {
+        title: '量子计算基础',
+        lessons: [
+          {
+            title: '量子比特与量子门',
+            videoUrl: 'https://example.com/video1.mp4',
+            materials: ['https://example.com/pdf1.pdf', 'https://example.com/slides1.pptx']
+          },
+          {
+            title: '量子电路模型',
+            videoUrl: 'https://example.com/video2.mp4',
+            materials: ['https://example.com/pdf2.pdf']
+          },
+          {
+            title: '量子算法概述',
+            videoUrl: 'https://example.com/video3.mp4',
+            materials: ['https://example.com/pdf3.pdf']
+          }
+        ]
+      },
+      {
+        title: '量子机器学习',
+        lessons: [
+          {
+            title: '量子支持向量机',
+            videoUrl: 'https://example.com/video4.mp4',
+            materials: ['https://example.com/pdf4.pdf']
+          },
+          {
+            title: '量子神经网络',
+            videoUrl: 'https://example.com/video5.mp4',
+            materials: ['https://example.com/pdf5.pdf']
+          }
+        ]
+      }
+    ]
   },
-  {
-    id: '2',
-    title: '大模型提示工程高级技巧',
-    description: '掌握大型语言模型的提示工程技术，学习如何设计有效提示以获得最佳生成结果。',
-    category: '提示工程',
-    instructor: 'Prof. 李楠',
-    students: 156,
-    status: 'published',
-    tags: ['LLM', '提示工程', 'AI应用'],
-    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
-  },
-  {
-    id: '3',
-    title: '多模态AI系统架构设计',
-    description: '学习如何设计和实现处理文本、图像和音频的多模态AI系统架构。',
-    category: '系统架构',
-    instructor: 'Dr. 王强',
-    students: 73,
-    status: 'published',
-    tags: ['多模态', '系统架构', 'AI设计'],
-    coverImage: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
-  },
-  {
-    id: '4',
-    title: '下一代AI模型预测与展望',
-    description: '分析人工智能领域的发展趋势，预测下一代模型的能力和应用场景。',
-    category: 'AI研究',
-    instructor: '研究团队',
-    students: 0,
-    status: 'draft',
-    tags: ['AI未来', '前沿研究', '技术展望'],
-    coverImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158',
-  },
+  // ... keep existing code (other course data)
 ];
 
 const placeholderImages = [
@@ -119,8 +137,12 @@ const CoursesManagement: React.FC = () => {
     instructor: '',
     content: '',
     tags: '',
-    coverImage: ''
+    coverImage: '',
+    price: '0',
+    isFree: true
   });
+  
+  const [chapters, setChapters] = useState<CourseChapter[]>([]);
 
   const handleOpenNewCourse = () => {
     setIsEditing(false);
@@ -131,8 +153,11 @@ const CoursesManagement: React.FC = () => {
       instructor: '',
       content: '',
       tags: '',
-      coverImage: placeholderImages[Math.floor(Math.random() * placeholderImages.length)]
+      coverImage: placeholderImages[Math.floor(Math.random() * placeholderImages.length)],
+      price: '0',
+      isFree: true
     });
+    setChapters([]);
     setPreviewMode(false);
     setOpenDialog(true);
   };
@@ -147,8 +172,11 @@ const CoursesManagement: React.FC = () => {
       instructor: course.instructor,
       content: course.content || '',
       tags: course.tags ? course.tags.join(', ') : '',
-      coverImage: course.coverImage || ''
+      coverImage: course.coverImage || '',
+      price: course.price?.toString() || '0',
+      isFree: course.isFree !== undefined ? course.isFree : true
     });
+    setChapters(course.chapters || []);
     setPreviewMode(false);
     setOpenDialog(true);
   };
@@ -163,8 +191,11 @@ const CoursesManagement: React.FC = () => {
       instructor: course.instructor,
       content: course.content || '',
       tags: course.tags ? course.tags.join(', ') : '',
-      coverImage: course.coverImage || ''
+      coverImage: course.coverImage || '',
+      price: course.price?.toString() || '0',
+      isFree: course.isFree !== undefined ? course.isFree : true
     });
+    setChapters(course.chapters || []);
     setPreviewMode(true);
     setOpenDialog(true);
   };
@@ -178,10 +209,18 @@ const CoursesManagement: React.FC = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    if (e.target.name === 'isFree') {
+      setFormData({
+        ...formData,
+        isFree: (e.target as HTMLInputElement).checked,
+        ...(!(e.target as HTMLInputElement).checked ? {} : { price: '0' })
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [e.target.name]: e.target.value
+      });
+    }
   };
 
   const handleCoverImageSelect = (imageUrl: string) => {
@@ -189,6 +228,52 @@ const CoursesManagement: React.FC = () => {
       ...formData,
       coverImage: imageUrl
     });
+  };
+
+  const addChapter = () => {
+    setChapters([...chapters, { title: `章节 ${chapters.length + 1}`, lessons: [] }]);
+  };
+
+  const updateChapterTitle = (index: number, title: string) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[index].title = title;
+    setChapters(updatedChapters);
+  };
+
+  const addLesson = (chapterIndex: number) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex].lessons.push({
+      title: `课时 ${updatedChapters[chapterIndex].lessons.length + 1}`,
+      videoUrl: '',
+      materials: []
+    });
+    setChapters(updatedChapters);
+  };
+
+  const updateLessonTitle = (chapterIndex: number, lessonIndex: number, title: string) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex].lessons[lessonIndex].title = title;
+    setChapters(updatedChapters);
+  };
+
+  const updateLessonVideo = (chapterIndex: number, lessonIndex: number, videoUrl: string) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex].lessons[lessonIndex].videoUrl = videoUrl;
+    setChapters(updatedChapters);
+  };
+
+  const addLessonMaterial = (chapterIndex: number, lessonIndex: number, materialUrl: string) => {
+    const updatedChapters = [...chapters];
+    const materials = updatedChapters[chapterIndex].lessons[lessonIndex].materials || [];
+    updatedChapters[chapterIndex].lessons[lessonIndex].materials = [...materials, materialUrl];
+    setChapters(updatedChapters);
+  };
+
+  const removeLessonMaterial = (chapterIndex: number, lessonIndex: number, materialIndex: number) => {
+    const updatedChapters = [...chapters];
+    updatedChapters[chapterIndex].lessons[lessonIndex].materials = 
+      updatedChapters[chapterIndex].lessons[lessonIndex].materials?.filter((_, idx) => idx !== materialIndex);
+    setChapters(updatedChapters);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -204,7 +289,10 @@ const CoursesManagement: React.FC = () => {
       status: 'draft',
       content: formData.content,
       tags: formData.tags.split(',').map(tag => tag.trim()),
-      coverImage: formData.coverImage
+      coverImage: formData.coverImage,
+      price: formData.isFree ? 0 : parseInt(formData.price, 10),
+      isFree: formData.isFree,
+      chapters: chapters
     };
 
     if (isEditing && currentCourse) {
@@ -263,6 +351,7 @@ const CoursesManagement: React.FC = () => {
             <TableHead>分类</TableHead>
             <TableHead>讲师</TableHead>
             <TableHead>学生数</TableHead>
+            <TableHead>价格</TableHead>
             <TableHead>状态</TableHead>
             <TableHead className="text-right">操作</TableHead>
           </TableRow>
@@ -289,6 +378,13 @@ const CoursesManagement: React.FC = () => {
               <TableCell>{course.category}</TableCell>
               <TableCell>{course.instructor}</TableCell>
               <TableCell>{course.students}</TableCell>
+              <TableCell>
+                {course.isFree ? (
+                  <span className="text-green-600">免费</span>
+                ) : (
+                  <span>¥{course.price}</span>
+                )}
+              </TableCell>
               <TableCell>
                 <Badge 
                   variant={course.status === 'published' ? 'default' : 'outline'}
@@ -332,7 +428,7 @@ const CoursesManagement: React.FC = () => {
       </Table>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent className={previewMode ? "sm:max-w-[800px]" : "sm:max-w-[725px]"}>
+        <DialogContent className={previewMode ? "sm:max-w-[800px]" : "sm:max-w-[725px] max-h-[90vh] overflow-y-auto"}>
           <DialogHeader>
             <DialogTitle>
               {previewMode 
@@ -375,6 +471,9 @@ const CoursesManagement: React.FC = () => {
                   <div className="flex items-center">
                     学生数: {currentCourse?.students || 0}
                   </div>
+                  <div className="flex items-center">
+                    价格: {formData.isFree ? "免费" : `¥${formData.price}`}
+                  </div>
                 </div>
                 
                 <p className="mt-4 text-gray-600">{formData.description}</p>
@@ -395,14 +494,42 @@ const CoursesManagement: React.FC = () => {
                   <ReactMarkdown>{formData.content}</ReactMarkdown>
                 </div>
               )}
+
+              {chapters.length > 0 && (
+                <div className="mt-8">
+                  <h2 className="text-xl font-bold mb-4">课程大纲</h2>
+                  <div className="space-y-4">
+                    {chapters.map((chapter, chapterIdx) => (
+                      <div key={chapterIdx} className="border rounded-md p-4">
+                        <h3 className="text-lg font-semibold mb-2">{chapter.title}</h3>
+                        <ul className="space-y-2">
+                          {chapter.lessons.map((lesson, lessonIdx) => (
+                            <li key={lessonIdx} className="flex items-center gap-2">
+                              <span className="w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs">
+                                {lessonIdx + 1}
+                              </span>
+                              <span>{lesson.title}</span>
+                              {lesson.videoUrl && <Video className="h-4 w-4 text-gray-400" />}
+                              {lesson.materials && lesson.materials.length > 0 && 
+                                <File className="h-4 w-4 text-gray-400" />}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
               <Tabs defaultValue="basic">
                 <TabsList className="mb-4">
                   <TabsTrigger value="basic">基本信息</TabsTrigger>
-                  <TabsTrigger value="content">课程内容</TabsTrigger>
+                  <TabsTrigger value="content">课程介绍</TabsTrigger>
+                  <TabsTrigger value="curriculum">课程大纲</TabsTrigger>
                   <TabsTrigger value="cover">封面图片</TabsTrigger>
+                  <TabsTrigger value="pricing">定价</TabsTrigger>
                   <TabsTrigger value="tags">标签</TabsTrigger>
                 </TabsList>
                 
@@ -451,7 +578,7 @@ const CoursesManagement: React.FC = () => {
                 
                 <TabsContent value="content" className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="content">课程内容 (Markdown格式)</Label>
+                    <Label htmlFor="content">课程介绍内容 (Markdown格式)</Label>
                     <Textarea
                       id="content"
                       name="content"
@@ -460,6 +587,135 @@ const CoursesManagement: React.FC = () => {
                       className="min-h-[200px] font-mono"
                     />
                   </div>
+                </TabsContent>
+                
+                <TabsContent value="curriculum" className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-medium">课程大纲</h3>
+                    <Button type="button" variant="outline" size="sm" onClick={addChapter}>
+                      添加章节
+                    </Button>
+                  </div>
+
+                  {chapters.length === 0 ? (
+                    <div className="text-center py-8 border rounded-lg border-dashed">
+                      <p className="text-gray-500">点击"添加章节"开始创建课程大纲</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {chapters.map((chapter, chapterIdx) => (
+                        <div key={chapterIdx} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <div className="w-full">
+                              <Input
+                                value={chapter.title}
+                                onChange={(e) => updateChapterTitle(chapterIdx, e.target.value)}
+                                placeholder="章节标题"
+                                className="font-medium"
+                              />
+                            </div>
+                            <Button 
+                              type="button" 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => addLesson(chapterIdx)}
+                              className="ml-2"
+                            >
+                              添加课时
+                            </Button>
+                          </div>
+
+                          {chapter.lessons.length === 0 ? (
+                            <p className="text-gray-500 text-sm text-center py-4">点击"添加课时"创建本章节的内容</p>
+                          ) : (
+                            <div className="space-y-4 pl-4">
+                              {chapter.lessons.map((lesson, lessonIdx) => (
+                                <div key={lessonIdx} className="border-l-2 pl-4 pb-4">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="w-6 h-6 bg-primary/10 text-primary rounded-full flex items-center justify-center text-xs">
+                                        {lessonIdx + 1}
+                                      </span>
+                                      <Input
+                                        value={lesson.title}
+                                        onChange={(e) => updateLessonTitle(chapterIdx, lessonIdx, e.target.value)}
+                                        placeholder="课时标题"
+                                        className="w-full"
+                                      />
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="mt-2 space-y-2">
+                                    <div>
+                                      <Label className="text-xs">视频链接</Label>
+                                      <div className="flex gap-2">
+                                        <Input
+                                          value={lesson.videoUrl || ''}
+                                          onChange={(e) => updateLessonVideo(chapterIdx, lessonIdx, e.target.value)}
+                                          placeholder="输入视频URL或上传视频"
+                                          className="flex-1"
+                                        />
+                                        <Button type="button" variant="outline" size="sm">
+                                          <Video className="h-4 w-4 mr-1" />
+                                          上传
+                                        </Button>
+                                      </div>
+                                    </div>
+                                    
+                                    <div>
+                                      <Label className="text-xs">课件资料</Label>
+                                      <div className="flex gap-2 mb-2">
+                                        <Input
+                                          placeholder="输入课件URL或上传文件"
+                                          className="flex-1"
+                                          id={`material-${chapterIdx}-${lessonIdx}`}
+                                        />
+                                        <Button 
+                                          type="button" 
+                                          variant="outline" 
+                                          size="sm"
+                                          onClick={() => {
+                                            const input = document.getElementById(`material-${chapterIdx}-${lessonIdx}`) as HTMLInputElement;
+                                            if (input.value) {
+                                              addLessonMaterial(chapterIdx, lessonIdx, input.value);
+                                              input.value = '';
+                                            }
+                                          }}
+                                        >
+                                          <File className="h-4 w-4 mr-1" />
+                                          添加
+                                        </Button>
+                                      </div>
+                                      
+                                      {lesson.materials && lesson.materials.length > 0 && (
+                                        <div className="pl-2 space-y-1">
+                                          {lesson.materials.map((material, materialIdx) => (
+                                            <div key={materialIdx} className="flex items-center text-sm">
+                                              <File className="h-3 w-3 mr-1 text-gray-400" />
+                                              <span className="truncate flex-1">{material.split('/').pop()}</span>
+                                              <Button 
+                                                type="button" 
+                                                variant="ghost" 
+                                                size="sm"
+                                                className="h-6 w-6 p-0 text-red-500"
+                                                onClick={() => removeLessonMaterial(chapterIdx, lessonIdx, materialIdx)}
+                                              >
+                                                <Trash2 className="h-3 w-3" />
+                                              </Button>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="cover" className="space-y-4">
@@ -507,6 +763,43 @@ const CoursesManagement: React.FC = () => {
                         className="mt-1"
                       />
                     </div>
+                  </div>
+                </TabsContent>
+                
+                <TabsContent value="pricing" className="space-y-4">
+                  <div className="grid gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="isFree"
+                        name="isFree"
+                        checked={formData.isFree}
+                        onChange={(e) => handleInputChange(e)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="isFree">免费课程</Label>
+                    </div>
+                    
+                    {!formData.isFree && (
+                      <div className="grid gap-2">
+                        <Label htmlFor="price">价格（人民币）</Label>
+                        <div className="relative">
+                          <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500">
+                            ¥
+                          </span>
+                          <Input
+                            id="price"
+                            name="price"
+                            type="number"
+                            value={formData.price}
+                            onChange={handleInputChange}
+                            className="pl-8"
+                            min="0"
+                            required={!formData.isFree}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </TabsContent>
                 

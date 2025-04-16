@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Atom, 
   BrainCircuit, 
@@ -15,6 +14,7 @@ import {
   Award
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Course {
   id: string;
@@ -34,7 +34,6 @@ interface Course {
   }[];
 }
 
-// 模拟课程数据
 const coursesData: Record<string, Course> = {
   '1': {
     id: '1',
@@ -176,6 +175,29 @@ const coursesData: Record<string, Course> = {
 const CourseDetail = () => {
   const { id } = useParams<{ id: string }>();
   const course = id ? coursesData[id] : null;
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleEnrollCourse = () => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    
+    if (!isLoggedIn) {
+      toast({
+        title: "请先登录",
+        description: "您需要登录才能报名课程",
+        variant: "destructive"
+      });
+      navigate('/login', { state: { from: `/course/${id}` } });
+      return;
+    }
+    
+    navigate(`/course-enrollment/${id}`);
+    
+    toast({
+      title: "报名成功",
+      description: "欢迎加入课程学习",
+    });
+  };
 
   if (!course) {
     return (
@@ -192,7 +214,6 @@ const CourseDetail = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
-      {/* 顶部图片和标题区 */}
       <div className="relative h-[40vh] min-h-[300px]">
         <div className="absolute inset-0">
           <img 
@@ -221,18 +242,14 @@ const CourseDetail = () => {
         </div>
       </div>
       
-      {/* 主要内容 */}
       <div className="container mx-auto px-4 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* 左侧内容信息 */}
           <div className="lg:col-span-2 space-y-8">
-            {/* 课程介绍 */}
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
               <h2 className="text-2xl font-bold mb-4">课程介绍</h2>
               <p className="text-gray-300 leading-relaxed">{course.fullDescription}</p>
             </div>
             
-            {/* 课程章节 */}
             <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-6">
               <h2 className="text-2xl font-bold mb-6">课程大纲</h2>
               
@@ -262,9 +279,7 @@ const CourseDetail = () => {
             </div>
           </div>
           
-          {/* 右侧信息卡片 */}
           <div className="space-y-6">
-            {/* 报名卡片 */}
             <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 rounded-xl p-6 sticky top-24">
               <div className="pb-4 mb-4 border-b border-gray-700">
                 <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
@@ -273,7 +288,10 @@ const CourseDetail = () => {
                 <p className="text-gray-400 text-sm mt-1">开放注册中</p>
               </div>
               
-              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 mb-4">
+              <Button 
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 mb-4"
+                onClick={handleEnrollCourse}
+              >
                 立即报名
               </Button>
               
