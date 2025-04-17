@@ -1,8 +1,8 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, BookOpen } from 'lucide-react';
+import { Calendar, Users, BookOpen, Tag } from 'lucide-react';
 
 export interface Content {
   id: string;
@@ -88,6 +88,8 @@ export const mockRecommendedContent: Content[] = [
 ];
 
 const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
+  const navigate = useNavigate();
+  
   // Function to get badge color based on category
   const getBadgeStyle = (category: string) => {
     const categories: Record<string, string> = {
@@ -99,6 +101,12 @@ const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
     };
     
     return categories[category] || 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+  };
+
+  const handleTagClick = (tag: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/search?tag=${encodeURIComponent(tag)}`);
   };
 
   return (
@@ -149,6 +157,23 @@ const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
               </div>
             )}
           </div>
+          
+          {/* 显示标签 */}
+          {content.tags && content.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {content.tags.map((tag, index) => (
+                <Badge 
+                  key={index} 
+                  variant="outline" 
+                  className="text-xs bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border-blue-800 cursor-pointer"
+                  onClick={(e) => handleTagClick(tag, e)}
+                >
+                  <Tag size={10} className="mr-1" />
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Link>

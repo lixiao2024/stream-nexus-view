@@ -1,10 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import SearchBar from '@/components/SearchBar';
 import ContentCard, { Content } from '@/components/ContentCard';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Tag } from 'lucide-react';
 
 // Mock data - in a real app, you would fetch this from your API
 import { mockArticles } from '@/data/mockArticles';
@@ -15,23 +17,52 @@ import { mockRecommendedContent } from '@/components/RecommendedFeed';
 const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
+  const tagFilter = searchParams.get('tag') || '';
   const [filteredArticles, setFilteredArticles] = useState<Content[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Content[]>([]);
   const [activeTab, setActiveTab] = useState('all');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
 
   useEffect(() => {
-    if (query) {
+    // Set active tag from URL
+    if (tagFilter) {
+      setActiveTag(tagFilter);
+    } else {
+      setActiveTag(null);
+    }
+    
+    // Combine mockArticles and recommended articles for a comprehensive search
+    const allArticles = [...mockArticles];
+    
+    // Add recommended content if not already in the articles list
+    mockRecommendedContent.forEach(item => {
+      if (!allArticles.some(article => article.id === item.id)) {
+        allArticles.push(item);
+      }
+    });
+    
+    // Filter based on tag if present
+    if (tagFilter) {
+      const normalizedTag = tagFilter.toLowerCase().trim();
+      
+      const articlesResults = allArticles.filter(article => 
+        article.tags && article.tags.some(tag => 
+          tag.toLowerCase() === normalizedTag
+        )
+      );
+      
+      const coursesResults = mockCourses.filter(course => 
+        course.tags && course.tags.some(tag => 
+          tag.toLowerCase() === normalizedTag
+        )
+      );
+      
+      setFilteredArticles(articlesResults);
+      setFilteredCourses(coursesResults);
+    }
+    // Filter based on search query if present
+    else if (query) {
       const normalizedQuery = query.toLowerCase().trim();
-      
-      // Combine mockArticles and recommended articles for a comprehensive search
-      const allArticles = [...mockArticles];
-      
-      // Add recommended content if not already in the articles list
-      mockRecommendedContent.forEach(item => {
-        if (!allArticles.some(article => article.id === item.id)) {
-          allArticles.push(item);
-        }
-      });
       
       // Enhanced filtering for articles
       const articlesResults = allArticles.filter(article => 
@@ -67,11 +98,34 @@ const Search = () => {
       setFilteredArticles(articlesResults);
       setFilteredCourses(coursesResults);
     } else {
-      setFilteredArticles([]);
-      setFilteredCourses([]);
+      // If no query or tag, show all content
+      setFilteredArticles(allArticles);
+      setFilteredCourses(mockCourses);
     }
-  }, [query]);
+  }, [query, tagFilter]);
 
+  // Get all unique tags from articles and courses
+  const getAllTags = () => {
+    const tagSet = new Set<string>();
+    
+    // Add tags from articles
+    filteredArticles.forEach(article => {
+      if (article.tags) {
+        article.tags.forEach(tag => tagSet.add(tag));
+      }
+    });
+    
+    // Add tags from courses
+    filteredCourses.forEach(course => {
+      if (course.tags) {
+        course.tags.forEach(tag => tagSet.add(tag));
+      }
+    });
+    
+    return Array.from(tagSet);
+  };
+
+  const allTags = getAllTags();
   const totalResults = filteredArticles.length + filteredCourses.length;
 
   return (
@@ -95,9 +149,37 @@ const Search = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold">搜索结果: "{query}"</h2>
+          {tagFilter ? (
+            <h2 className="text-2xl font-bold">标签: "{tagFilter}"</h2>
+          ) : (
+            <h2 className="text-2xl font-bold">搜索结果: "{query}"</h2>
+          )}
           <p className="text-gray-400">找到 {totalResults} 个相关结果</p>
         </div>
+        
+        {/* Tags filter bar */}
+        {allTags.length > 0 && (
+          <div className="mb-6 overflow-x-auto">
+            <div className="flex flex-wrap gap-2 py-2">
+              <Link 
+                to="/search" 
+                className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm ${!activeTag ? 'bg-primary text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+              >
+                全部
+              </Link>
+              {allTags.map((tag, index) => (
+                <Link 
+                  key={index} 
+                  to={`/search?tag=${encodeURIComponent(tag)}`}
+                  className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm ${activeTag === tag ? 'bg-primary text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                >
+                  <Tag size={14} className="mr-1.5" />
+                  {tag}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {totalResults > 0 ? (
           <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
