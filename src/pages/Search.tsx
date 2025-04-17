@@ -18,17 +18,24 @@ const Search = () => {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const tagFilter = searchParams.get('tag') || '';
+  const categoryFilter = searchParams.get('category') || '';
   const [filteredArticles, setFilteredArticles] = useState<Content[]>([]);
   const [filteredCourses, setFilteredCourses] = useState<Content[]>([]);
   const [activeTab, setActiveTab] = useState('all');
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
   useEffect(() => {
     // Set active tag from URL
     if (tagFilter) {
       setActiveTag(tagFilter);
+      setActiveCategory(null);
+    } else if (categoryFilter) {
+      setActiveCategory(categoryFilter);
+      setActiveTag(null);
     } else {
       setActiveTag(null);
+      setActiveCategory(null);
     }
     
     // Combine mockArticles and recommended articles for a comprehensive search
@@ -41,8 +48,23 @@ const Search = () => {
       }
     });
     
+    // Filter based on category if present
+    if (categoryFilter) {
+      const normalizedCategory = categoryFilter.toLowerCase().trim();
+      
+      const articlesResults = allArticles.filter(article => 
+        article.category.toLowerCase().includes(normalizedCategory)
+      );
+      
+      const coursesResults = mockCourses.filter(course => 
+        course.category.toLowerCase().includes(normalizedCategory)
+      );
+      
+      setFilteredArticles(articlesResults);
+      setFilteredCourses(coursesResults);
+    }
     // Filter based on tag if present
-    if (tagFilter) {
+    else if (tagFilter) {
       const normalizedTag = tagFilter.toLowerCase().trim();
       
       const articlesResults = allArticles.filter(article => 
@@ -102,7 +124,7 @@ const Search = () => {
       setFilteredArticles(allArticles);
       setFilteredCourses(mockCourses);
     }
-  }, [query, tagFilter]);
+  }, [query, tagFilter, categoryFilter]);
 
   // Get all unique tags from articles and courses
   const getAllTags = () => {
@@ -127,6 +149,26 @@ const Search = () => {
 
   const allTags = getAllTags();
   const totalResults = filteredArticles.length + filteredCourses.length;
+  
+  // Function to get the page title based on filters
+  const getPageTitle = () => {
+    if (categoryFilter) {
+      const categoryMap: Record<string, string> = {
+        'ai': '人工智能研究',
+        'ml': '机器学习',
+        'nlp': '自然语言处理',
+        'cv': '计算机视觉',
+        'robotics': '机器人学',
+        'ethics': '人工智能伦理'
+      };
+      return `分类: "${categoryMap[categoryFilter] || categoryFilter}"`;
+    } else if (tagFilter) {
+      return `标签: "${tagFilter}"`;
+    } else if (query) {
+      return `搜索结果: "${query}"`;
+    }
+    return '全部内容';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
@@ -149,11 +191,7 @@ const Search = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          {tagFilter ? (
-            <h2 className="text-2xl font-bold">标签: "{tagFilter}"</h2>
-          ) : (
-            <h2 className="text-2xl font-bold">搜索结果: "{query}"</h2>
-          )}
+          <h2 className="text-2xl font-bold">{getPageTitle()}</h2>
           <p className="text-gray-400">找到 {totalResults} 个相关结果</p>
         </div>
         
@@ -163,7 +201,7 @@ const Search = () => {
             <div className="flex flex-wrap gap-2 py-2">
               <Link 
                 to="/search" 
-                className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm ${!activeTag ? 'bg-primary text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
+                className={`inline-flex items-center px-3 py-1.5 rounded-full text-sm ${!activeTag && !activeCategory ? 'bg-primary text-white' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'}`}
               >
                 全部
               </Link>
