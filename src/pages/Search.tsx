@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 // Mock data - in a real app, you would fetch this from your API
 import { mockArticles } from '@/data/mockArticles';
 import { mockCourses } from '@/data/mockCourses';
+// Import the recommended content from RecommendedFeed
+import { mockRecommendedContent } from '@/components/RecommendedFeed';
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -21,8 +23,18 @@ const Search = () => {
     if (query) {
       const normalizedQuery = query.toLowerCase().trim();
       
+      // Combine mockArticles and recommended articles for a comprehensive search
+      const allArticles = [...mockArticles];
+      
+      // Add recommended content if not already in the articles list
+      mockRecommendedContent.forEach(item => {
+        if (!allArticles.some(article => article.id === item.id)) {
+          allArticles.push(item);
+        }
+      });
+      
       // Enhanced filtering for articles
-      const articlesResults = mockArticles.filter(article => 
+      const articlesResults = allArticles.filter(article => 
         // Title match
         article.title.toLowerCase().includes(normalizedQuery) || 
         // Summary/content match
@@ -34,7 +46,9 @@ const Search = () => {
         // Author match
         article.authors.some(author => 
           author.toLowerCase().includes(normalizedQuery)
-        )
+        ) ||
+        // Category match (treating as a tag)
+        article.category.toLowerCase().includes(normalizedQuery)
       );
       
       // Enhanced filtering for courses with the same logic
@@ -46,7 +60,8 @@ const Search = () => {
         )) ||
         course.authors.some(author => 
           author.toLowerCase().includes(normalizedQuery)
-        )
+        ) ||
+        course.category.toLowerCase().includes(normalizedQuery)
       );
       
       setFilteredArticles(articlesResults);

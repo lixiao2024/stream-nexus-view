@@ -18,7 +18,7 @@ export interface Content {
 }
 
 // 为推荐内容的模拟数据
-const mockRecommendedContent: Content[] = [
+export const mockRecommendedContent: Content[] = [
   {
     id: '1',
     title: 'Anthropic发布Claude 3.5：创建新的性能基准',
@@ -27,7 +27,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月12日',
     authors: ['Anthropic研究团队'],
     isHighlighted: true,
-    coverImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625'
+    coverImage: 'https://images.unsplash.com/photo-1487958449943-2429e8be8625',
+    tags: ['Claude', 'AI', 'LLM', 'Anthropic']
   },
   {
     id: '2',
@@ -37,7 +38,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月11日',
     authors: ['安全研究小组'],
     isHighlighted: true,
-    coverImage: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742'
+    coverImage: 'https://images.unsplash.com/photo-1518005020951-eccb494ad742',
+    tags: ['Gemini', 'Google', '安全', '代码生成']
   },
   {
     id: '3',
@@ -47,7 +49,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月10日',
     authors: ['张, L.', '约翰逊, K.', '帕特尔, S.'],
     citations: 42,
-    coverImage: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'
+    coverImage: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
+    tags: ['LLM', '合成数据', '训练']
   },
   {
     id: '4',
@@ -57,7 +60,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月8日',
     authors: ['李, J.', '加西亚, M.', '金, H.'],
     citations: 37,
-    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb'
+    coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
+    tags: ['ViT', '自动驾驶', '物体检测']
   },
   {
     id: '5',
@@ -67,7 +71,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月7日',
     authors: ['罗德里格斯, A.', '史密斯, T.'],
     citations: 19,
-    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5'
+    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
+    tags: ['提示工程', '领域特定', 'AI应用']
   },
   {
     id: '6',
@@ -77,7 +82,8 @@ const mockRecommendedContent: Content[] = [
     date: '2025年4月6日',
     authors: ['王, R.', '伊万诺夫, A.', '穆勒, K.'],
     citations: 28,
-    coverImage: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81'
+    coverImage: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81',
+    tags: ['强化学习', '机器人协作', '多代理']
   }
 ];
 
