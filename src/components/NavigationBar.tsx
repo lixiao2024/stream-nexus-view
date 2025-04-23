@@ -16,6 +16,7 @@ const categories: Category[] = [
   { id: 'cv', name: '计算机视觉' },
   { id: 'robotics', name: '机器人学' },
   { id: 'ethics', name: '人工智能伦理' },
+  { id: 'ai-resume', name: 'AI简历' }, // New category added
 ];
 
 interface NavigationBarProps {
@@ -52,7 +53,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             onClick={() => handleCategoryClick(category.id)}
             className={cn(
               "nav-link",
-              activeCategory === category.id && "nav-link-active"
+              activeCategory === category.id && "nav-link-active",
+              category.id === 'ai-resume' && "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700" // Make AI简历 entry more prominent
             )}
           >
             {category.name}
