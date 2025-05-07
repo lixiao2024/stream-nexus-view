@@ -57,3 +57,20 @@
   gap: 1.5rem;
 }
 
+/* 3D Pin Animation Styles */
+.gradient-pin {
+  background: linear-gradient(135deg, #9b87f5 0%, #6E59A5 50%, #8B5CF6 100%);
+}
+
+.pin-shadow {
+  box-shadow: 0 10px 30px -5px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pin-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}

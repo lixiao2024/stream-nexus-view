@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tag } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Content } from './RecommendedFeed';
+import { PinContainer } from './ui/3d-pin';
 
 interface ArticleCardProps {
   content: Content;
@@ -25,13 +26,17 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
         className
       )}
     >
-      {/* Image container */}
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
+      {/* Image container with PinContainer wrapper */}
+      <PinContainer 
+        href={`/content/${content.id}`}
+        title="查看详情"
+        containerClassName="relative aspect-[16/9] w-full overflow-hidden bg-gray-100"
+      >
         {content.coverImage ? (
           <img
             src={`${content.coverImage}?w=600&auto=format&fit=crop`}
             alt={content.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            className="h-full w-full object-cover transition-transform duration-300"
           />
         ) : (
           <div className="flex h-full items-center justify-center bg-gray-200 text-gray-500">
@@ -42,11 +47,11 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
         {/* Category badge */}
         <Badge 
           variant="outline" 
-          className="absolute left-3 top-3 bg-white/80 backdrop-blur-sm"
+          className="absolute left-3 top-3 bg-white/80 backdrop-blur-sm z-10"
         >
           {content.category}
         </Badge>
-      </div>
+      </PinContainer>
       
       {/* Content */}
       <div className="flex flex-col gap-2 p-4 bg-white flex-grow">
