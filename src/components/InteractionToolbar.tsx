@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { Bookmark, Share2, ThumbsUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
+import { cn } from "@/lib/utils";
 
 interface InteractionToolbarProps {
   contentId: string;
