@@ -97,12 +97,12 @@ const RecommendedFeed: React.FC = () => {
       {headlines.length > 0 && (
         <div>
           <h2 className="text-xl font-bold mb-4">今日头条</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {headlines.map(content => (
               <ArticleCard 
                 key={content.id} 
                 content={content} 
-                featured={true}
+                featured={false}
               />
             ))}
           </div>
@@ -111,8 +111,8 @@ const RecommendedFeed: React.FC = () => {
       
       <div>
         <h2 className="text-xl font-bold mb-4">为您推荐</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {regularContent.map(content => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {regularContent.map((content, index) => (
             <ArticleCard 
               key={content.id} 
               content={content} 

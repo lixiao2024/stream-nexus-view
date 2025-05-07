@@ -21,13 +21,12 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
     <Link 
       to={`/content/${content.id}`} 
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg",
-        featured ? "col-span-2" : "",
+        "group flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-lg h-full",
         className
       )}
     >
       {/* Image container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-gray-100">
         {content.coverImage ? (
           <img
             src={`${content.coverImage}?w=600&auto=format&fit=crop`}
@@ -50,8 +49,8 @@ const ArticleCard: React.FC<ArticleCardProps> = ({
       </div>
       
       {/* Content */}
-      <div className="flex flex-col gap-2 p-4 bg-white">
-        <h3 className={`line-clamp-2 font-semibold text-gray-900 ${featured ? "text-xl" : "text-base"}`}>
+      <div className="flex flex-col gap-2 p-4 bg-white flex-grow">
+        <h3 className="line-clamp-2 font-semibold text-gray-900 text-base">
           {content.title}
         </h3>
         
