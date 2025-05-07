@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, BookOpen, Tag } from 'lucide-react';
+import ArticleCard from './ArticleCard';
 
 export interface Content {
   id: string;
@@ -87,122 +87,36 @@ export const mockRecommendedContent: Content[] = [
   }
 ];
 
-const ContentRow: React.FC<{ content: Content }> = ({ content }) => {
-  const navigate = useNavigate();
-  
-  // Function to get badge color based on category
-  const getBadgeStyle = (category: string) => {
-    const categories: Record<string, string> = {
-      '人工智能研究': 'bg-purple-100 text-purple-800 hover:bg-purple-200',
-      '安全': 'bg-red-100 text-red-800 hover:bg-red-200',
-      '自然语言处理': 'bg-blue-100 text-blue-800 hover:bg-blue-200',
-      '计算机视觉': 'bg-green-100 text-green-800 hover:bg-green-200',
-      '机器人学': 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-    };
-    
-    return categories[category] || 'bg-gray-100 text-gray-800 hover:bg-gray-200';
-  };
-
-  const handleTagClick = (tag: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(`/search?tag=${encodeURIComponent(tag)}`);
-  };
-
-  return (
-    <Link to={`/content/${content.id}`}>
-      <div className={`flex gap-4 p-4 rounded-lg border ${content.isHighlighted ? 'border-blue-500 bg-blue-500/5' : 'border-gray-800 hover:border-gray-700'} transition-all duration-300 hover:bg-black/20`}>
-        {/* 封面图 */}
-        <div className="shrink-0">
-          <div className="w-[120px] h-[80px] rounded-lg overflow-hidden bg-gray-800">
-            {content.coverImage && (
-              <img 
-                src={`${content.coverImage}?w=240&auto=format&fit=crop`} 
-                alt={content.title} 
-                className="w-full h-full object-cover"
-              />
-            )}
-          </div>
-        </div>
-        
-        {/* 内容 */}
-        <div className="flex-1">
-          <div className="flex justify-between items-start gap-2 mb-1">
-            <h3 className={`font-bold ${content.isHighlighted ? 'text-blue-400' : 'text-gray-100'}`}>
-              {content.title}
-            </h3>
-            <Badge variant="outline" className={`text-xs shrink-0 ${getBadgeStyle(content.category)}`}>
-              {content.category}
-            </Badge>
-          </div>
-          
-          <p className="text-sm text-gray-400 line-clamp-1 mb-2">
-            {content.summary}
-          </p>
-          
-          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
-            <div className="flex items-center">
-              <Calendar size={12} className="mr-1" />
-              {content.date}
-            </div>
-            <div className="flex items-center">
-              <Users size={12} className="mr-1" />
-              {content.authors.slice(0, 2).join(', ')}
-              {content.authors.length > 2 && ' 等'}
-            </div>
-            {content.citations !== undefined && (
-              <div className="flex items-center">
-                <BookOpen size={12} className="mr-1" />
-                {content.citations} 引用
-              </div>
-            )}
-          </div>
-          
-          {/* 显示标签 */}
-          {content.tags && content.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {content.tags.map((tag, index) => (
-                <Badge 
-                  key={index} 
-                  variant="outline" 
-                  className="text-xs bg-blue-900/30 hover:bg-blue-900/50 text-blue-300 border-blue-800 cursor-pointer"
-                  onClick={(e) => handleTagClick(tag, e)}
-                >
-                  <Tag size={10} className="mr-1" />
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </Link>
-  );
-};
-
 const RecommendedFeed: React.FC = () => {
   // 前两个是突出显示的（今日头条）
   const headlines = mockRecommendedContent.slice(0, 2);
   const regularContent = mockRecommendedContent.slice(2);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {headlines.length > 0 && (
         <div>
-          <h2 className="text-xl font-bold mb-3">今日头条</h2>
-          <div className="space-y-3">
+          <h2 className="text-xl font-bold mb-4">今日头条</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {headlines.map(content => (
-              <ContentRow key={content.id} content={content} />
+              <ArticleCard 
+                key={content.id} 
+                content={content} 
+                featured={true}
+              />
             ))}
           </div>
         </div>
       )}
       
       <div>
-        <h2 className="text-xl font-bold mb-3">为您推荐</h2>
-        <div className="space-y-3">
+        <h2 className="text-xl font-bold mb-4">为您推荐</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {regularContent.map(content => (
-            <ContentRow key={content.id} content={content} />
+            <ArticleCard 
+              key={content.id} 
+              content={content} 
+            />
           ))}
         </div>
       </div>
