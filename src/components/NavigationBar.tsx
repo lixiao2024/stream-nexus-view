@@ -16,7 +16,7 @@ const categories: Category[] = [
   { id: 'cv', name: '计算机视觉' },
   { id: 'robotics', name: '机器人学' },
   { id: 'ethics', name: '人工智能伦理' },
-  { id: 'ai-resume', name: 'AI简历' }, // New category added
+  { id: 'ai-resume', name: 'AI简历' },
 ];
 
 interface NavigationBarProps {
@@ -35,7 +35,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   };
 
   return (
-    <nav className={cn("flex overflow-x-auto py-3 px-1 no-scrollbar", className)}>
+    <nav className={cn("flex overflow-x-auto py-3 px-1 no-scrollbar border-b border-border/50", className)}>
       <div className="flex space-x-1 min-w-full">
         <Link 
           to="/" 
@@ -54,14 +54,14 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             className={cn(
               "nav-link",
               activeCategory === category.id && "nav-link-active",
-              category.id === 'ai-resume' && "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700" // Make AI简历 entry more prominent
+              category.id === 'ai-resume' && "bg-black text-white hover:bg-black/90"
             )}
           >
             {category.name}
           </button>
         ))}
         
-        <button className="ml-2 p-1 rounded-full hover:bg-gray-100">
+        <button className="ml-2 p-1 rounded-full hover:bg-secondary/80">
           <ChevronRight size={18} />
         </button>
       </div>
