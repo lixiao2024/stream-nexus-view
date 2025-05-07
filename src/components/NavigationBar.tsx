@@ -35,8 +35,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
   };
 
   return (
-    <nav className={cn("flex overflow-x-auto py-3 px-1 no-scrollbar border-b border-border/50", className)}>
-      <div className="flex space-x-1 min-w-full">
+    <nav className={cn("flex overflow-x-auto py-3 px-1 no-scrollbar border-b border-gray-200", className)}>
+      <div className="flex space-x-2 min-w-full">
         <Link 
           to="/" 
           className={cn(

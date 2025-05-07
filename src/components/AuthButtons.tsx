@@ -81,7 +81,7 @@ const AuthButtons: React.FC = () => {
               {userAvatar ? (
                 <AvatarImage src={userAvatar} alt={userName} />
               ) : (
-                <AvatarFallback className="bg-primary/10 text-primary">
+                <AvatarFallback className="bg-secondary text-primary">
                   {userName.substring(0, 1).toUpperCase()}
                 </AvatarFallback>
               )}
@@ -117,13 +117,13 @@ const AuthButtons: React.FC = () => {
   return (
     <div className="flex items-center space-x-3">
       <Link to="/login">
-        <Button variant="outline" size="sm" className="border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white">
+        <Button variant="outline" size="sm" className="border-gray-200 text-gray-700 hover:bg-gray-100">
           <LogIn className="mr-1 h-4 w-4" />
           登录
         </Button>
       </Link>
       <Link to="/register">
-        <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0">
+        <Button size="sm" className="bg-black hover:bg-black/90 text-white">
           <UserPlus className="mr-1 h-4 w-4" />
           注册
         </Button>

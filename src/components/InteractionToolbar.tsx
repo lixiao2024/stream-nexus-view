@@ -49,7 +49,9 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
         variant={liked ? "default" : "outline"} 
         size="sm"
         onClick={handleLike}
-        className="flex items-center gap-2"
+        className={cn("flex items-center gap-2", 
+          liked ? "bg-black text-white hover:bg-black/90" : "border-gray-200 hover:bg-gray-100"
+        )}
       >
         <ThumbsUp size={18} className={liked ? "fill-current" : ""} />
         <span>{likeCount}</span>
@@ -59,6 +61,9 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
         variant={saved ? "default" : "outline"}
         size="sm"
         onClick={handleSave}
+        className={cn(
+          saved ? "bg-black text-white hover:bg-black/90" : "border-gray-200 hover:bg-gray-100"
+        )}
       >
         <Bookmark size={18} className={saved ? "fill-current" : ""} />
         <span className="ml-2">{saved ? "已收藏" : "收藏"}</span>
@@ -68,6 +73,7 @@ const InteractionToolbar: React.FC<InteractionToolbarProps> = ({ contentId }) =>
         variant="outline"
         size="sm"
         onClick={handleShare}
+        className="border-gray-200 hover:bg-gray-100"
       >
         <Share2 size={18} />
         <span className="ml-2">分享</span>
